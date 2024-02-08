@@ -1,0 +1,45 @@
+version: "3"
+
+x-mssql-variables: &mssql-variables
+  ACCEPT_EULA: "Y"
+  MSSQL_SA_PASSWORD: "SuperSecret123"
+  MSSQL_HOST: "mssql-server"
+
+x-clickhouse-variables: &clickhouse-variables
+  CLICKHOUSE_PASSWORD: "default"
+  CLICKHOUSE_USER: "default"
+  CLICKHOUSE_HOST: "clickhouse"
+  CLICKHOUSE_PORT: "9000"
+
+services:
+  mssql-server:
+    build:
+      context: ./sql-server
+      dockerfile: Dockerfile
+    environment: *mssql-variables
+    ports:
+      - "1433:1433"
+    restart: on-failure:3
+
+  mssql-migrations:
+    build:
+      context: ./sql-server-migrations
+      dockerfile: Dockerfile
+    depends_on:
+      - mssql-server
+    environment: *mssql-variables
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    environment: *clickhouse-variables
+    ports:
+      - "9000:9000"
+      - "8123:8123"
+
+  clickhouse-migrations:
+    build:
+      context: ./clickhouse-migrations
+      dockerfile: Dockerfile
+    depends_on:
+      - clickhouse
+    environment: *clickhouse-variables
