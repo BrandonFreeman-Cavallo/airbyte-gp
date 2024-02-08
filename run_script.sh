@@ -1,14 +1,22 @@
 #!/bin/bash
 
+while getopts h: flag
+do
+    case "${flag}" in
+        h) DOCKER_HOST=${OPTARG};;
+    esac
+done
+
 AIRBYTE_HOST='http://localhost:33014'
+AIRBYTE_UI_HOST='http://localhost:8000'
 AIRBYTE_VERSION='v1'
 AIRBYTE_URL="$AIRBYTE_HOST/$AIRBYTE_VERSION"
 AIRBYTE_USER='airbyte'
 AIRBYTE_PASS='password'
 AIRBYTE_CREDS="$AIRBYTE_USER:$AIRBYTE_PASS"
 
-GP_MSSQL_HOST="172.31.64.1"
-GP_CLICKHOUSE_HOST="172.31.64.1"
+GP_MSSQL_HOST=$DOCKER_HOST
+GP_CLICKHOUSE_HOST=$DOCKER_HOST
 
 SOURCE_NAME="GP-mssql"
 DESTINATION_NAME="GP-clickhouse"
@@ -119,16 +127,6 @@ else
     echo "Destination already exists: $DESTINATION_NAME"
 fi 
 
-# curl --request GET \
-#      --user "$AIRBYTE_CREDS" \
-#      --url "$AIRBYTE_URL/destinations" \
-#      --header 'accept: application/json'
-
-# curl --request GET \
-#      --user "$AIRBYTE_CREDS" \
-#      --url "$AIRBYTE_URL/connections?includeDeleted=false&limit=20&offset=0" \
-#      --header 'accept: application/json'
-
 CONNECTION_ID=$(curl --request GET \
      --user "$AIRBYTE_CREDS" \
      --silent \
@@ -172,7 +170,8 @@ if [[ "$CONNECTION_ID" == "" ]]; then
         "status": "active",
         "schedule":
         {
-            "scheduleType": "manual"
+            "scheduleType": "cron",
+            "cronExpression": "0 0 * * * ? UTC"
         },
         "dataResidency": "auto",
         "nonBreakingSchemaUpdatesBehavior": "propagate_columns",
@@ -200,15 +199,33 @@ if [[ "$CONNECTION_ID" == "" ]]; then
         | grep -o '"connectionId":"[^"]*' | grep -o '[^"]*$')
 
     echo "Created Connection: $CONNECTION_ID"
+
+    NORMALIZATION_RESULT=$(curl --request POST \
+        --user "$AIRBYTE_CREDS" \
+        --silent \
+        --url "$AIRBYTE_UI_HOST/api/v1/web_backend/connections/update" \
+        --header 'accept: application/json' \
+        --header 'content-type: application/json' \
+        --data '
+        {
+            "connectionId": "'"$CONNECTION_ID"'",
+            "operations": [
+                {
+                    "name": "Normalization",
+                    "workspaceId": "'"$WORKSPACE_ID"'",
+                    "operatorConfiguration": {
+                        "operatorType": "normalization",
+                        "normalization": {
+                        "option": "basic"
+                        }
+                    }
+                }
+            ]
+        }
+        ')
+
 else
     echo "Connection already exists: $CONNECTION_NAME"
 fi 
-
-# curl --request GET \
-#      --user "$AIRBYTE_CREDS" \
-#      --silent \
-#      --url "$AIRBYTE_URL/connections/$CONNECTION_ID" \
-#      --header 'accept: application/json'
-
 
 echo "Done"

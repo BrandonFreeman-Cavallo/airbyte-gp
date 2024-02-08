@@ -40,6 +40,8 @@ services:
     build:
       context: ./clickhouse-migrations
       dockerfile: Dockerfile
+    environment: *clickhouse-variables
     depends_on:
       - clickhouse
-    environment: *clickhouse-variables
+    volumes:
+      - ./clickhouse-migrations/sql:/data/migrations/sql

@@ -1,9 +1,16 @@
-FROM clickhouse/clickhouse-server:latest
+FROM ubuntu:22.04
 
-ENV data_home=/data/deploy
+RUN apt update &&\
+    apt upgrade -y &&\
+    apt install -y curl
 
-RUN mkdir -p $data_home
+RUN curl https://clickhouse.com/ | sh &&\
+    mv clickhouse /usr/local/bin/clickhouse
 
-COPY run_script.sh $data_home/run_script.sh
-RUN chmod +x $data_home/run_script.sh
-CMD $data_home/run_script.sh
+ENV DATA_HOME=/data/migrations
+
+RUN mkdir -p $DATA_HOME
+
+COPY run_script.sh $DATA_HOME/run_script.sh
+RUN chmod +x $DATA_HOME/run_script.sh
+CMD $DATA_HOME/run_script.sh
