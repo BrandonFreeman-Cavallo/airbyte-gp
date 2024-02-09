@@ -16,6 +16,17 @@
 - Connect to the [Web interface](http://localhost:8000/).
 - Serve and Enjoy!
 
+### Backup Clickhouse
+
+- Make sure the `./clickhouse/backups` folder is empty.
+- Run `backup.sql` from the `./clickhouse/sql` folder.
+
+### Restore Clickhouse
+
+- Put Clickhouse backup files in the `./clickhouse/backups` folder.
+- File format is `<tablename>.backup.zip`
+- Run `restore.sql` from the `./clickhouse/sql` folder.
+
 ### Reads
 
 - [Airbyte API Docs](https://reference.airbyte.com/reference/start)
