@@ -16,16 +16,16 @@ done
 
 cd "$DATA_HOME/sql"
 
-touch history.log
+# touch history.log
 
 for FILE in *.sql; do
 
-  HASH=$(sha256sum $FILE | cut -f 1 -d " ")
+#   HASH=$(sha256sum $FILE | cut -f 1 -d " ")
 
-  if grep -Fxq "$HASH" history.log; then
-    echo "$FILE ($HASH) has already been executed on $CLICKHOUSE_HOST:$CLICKHOUSE_PORT"
-    continue
-  fi
+#   if grep -Fxq "$HASH" history.log; then
+#     echo "$FILE ($HASH) has already been executed on $CLICKHOUSE_HOST:$CLICKHOUSE_PORT"
+#     continue
+#   fi
 
   echo "Running $FILE ($HASH) on $CLICKHOUSE_HOST:$CLICKHOUSE_PORT ..."
 
@@ -37,7 +37,7 @@ for FILE in *.sql; do
 
   if [ $? -eq 0 ]
   then
-    echo $HASH >> history.log
+    # echo $HASH >> history.log
     echo "Successfully executed $FILE on $CLICKHOUSE_HOST:$CLICKHOUSE_PORT"
   else
     echo "Execution FAILED for $FILE on $CLICKHOUSE_HOST:$CLICKHOUSE_PORT"

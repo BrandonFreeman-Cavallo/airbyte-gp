@@ -1,0 +1,11 @@
+RESTORE TABLE analytics.IV00101 FROM Disk('backups', 'IV00101.backup.zip');
+RESTORE TABLE analytics.IV40201 FROM Disk('backups', 'IV40201.backup.zip');
+RESTORE TABLE analytics.RM00101 FROM Disk('backups', 'RM00101.backup.zip');
+RESTORE TABLE analytics.RM00201 FROM Disk('backups', 'RM00201.backup.zip');
+RESTORE TABLE analytics.RM00301 FROM Disk('backups', 'RM00301.backup.zip');
+RESTORE TABLE analytics.SOP10100 FROM Disk('backups', 'SOP10100.backup.zip');
+RESTORE TABLE analytics.SOP10200 FROM Disk('backups', 'SOP10200.backup.zip');
+RESTORE TABLE analytics.SOP30200 FROM Disk('backups', 'SOP30200.backup.zip');
+RESTORE TABLE analytics.SOP30300 FROM Disk('backups', 'SOP30300.backup.zip');
+RESTORE TABLE analytics.SOP40200 FROM Disk('backups', 'SOP40200.backup.zip');
+RESTORE TABLE analytics.SY01200 FROM Disk('backups', 'SY01200.backup.zip');
